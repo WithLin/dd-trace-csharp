@@ -13,12 +13,18 @@ std::shared_ptr<spdlog::logger> GetLogger() {
   if (logger == nullptr) {
     std::unique_lock<std::mutex> lck(mtx);
 
-    std::string logfile = R"(C:\ProgramData\Datadog\logs\profiler.log)";
-
     const auto programdata = GetEnvironmentValue(L"PROGRAMDATA");
-    const auto dddir = std::filesystem::path(programdata).append("Datadog");
+    const auto dddir = std::filesystem::path(programdata)
+                           .append("Datadog")
+                           .append("logs")
+                           .append("dotnet-profiler.log");
+
+    std::string logfile;
+
     if (std::filesystem::exists(dddir)) {
       logfile = dddir.string();
+    } else {
+      logfile = R"(C:\ProgramData\Datadog\logs\dotnet-profiler.log)";
     }
 
     logger = spdlog::rotating_logger_mt("dotnet-profiler", logfile,
